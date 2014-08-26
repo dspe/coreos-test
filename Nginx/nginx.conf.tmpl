@@ -1,0 +1,19 @@
+{{ range $server := gets "/ez/server/*" }}
+
+{{ $c := ( json $server.Value ) }}
+
+server {
+    listen 80;
+    server_name {{ printf "%s" $c.host }};
+    error_log /var/log/nginx/{{ printf "%s" $c.host}}.log;
+
+    location / {
+        proxy_pass http://{{ printf "%s" $c.ip }};
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+{{ end }}

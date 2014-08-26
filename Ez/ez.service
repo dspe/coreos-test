@@ -1,0 +1,16 @@
+[Unit]
+Description=ez
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+EnvironmentFile=/etc/environment
+#ExecStartPre=/usr/bin/docker pull dspe/ez53:latest
+ExecStart=/usr/bin/docker run --name %i --rm --link mysql:mysql -p :80 -e APACHE_SERVERNAME=%i -e APACHE_ENVIRONMENT=%p dspe/ez53
+#ExecStartPost=/usr/bin/etcdctl set /ez/server/%b 
+ExecStartPost=/bin/sh -c "sleep 20 && /usr/bin/etcdctl set /ez/server/%b '{\"host\": \"%i\", \"ip\": \"'$(/usr/bin/docker port %i 80)'\"}'"
+ExecStop=/usr/bin/docker kill %i
+#ExecStopPost=/usr/bin/etcdctl rm /ez/server/%b
+
+[X-Fleet]
+X-Conflicts=%p@%i.service

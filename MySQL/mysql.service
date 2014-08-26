@@ -1,0 +1,11 @@
+[Unit]
+Description=MySQL
+
+[Service]
+EnvironmentFile=/etc/environment
+#ExecStartPre=/usr/bin/docker pull marceldegraaf/nginx
+ExecStart=/usr/bin/docker run --rm --name mysql -p 3306:3306 dspe/mysql
+ExecStop=/usr/bin/docker kill mysql
+
+[X-Fleet]
+X-Conflicts=mysql.service
